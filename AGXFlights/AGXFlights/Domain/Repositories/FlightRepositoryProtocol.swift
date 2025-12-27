@@ -9,4 +9,5 @@ import Foundation
 
 protocol FlightRepositoryProtocol: Sendable {
     func searchFlights(query: String) async throws -> [Flight]
+    func fetchAllFlights() async throws -> [Flight]
 }

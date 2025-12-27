@@ -46,6 +46,17 @@ final class FlightRepositoryImpl: FlightRepositoryProtocol, Sendable {
         return filteredFlights
     }
     
+    func fetchAllFlights() async throws -> [Flight] {
+        if let cachedFlights = await cache.getFlights() {
+            return cachedFlights
+        }
+        
+        let allFlights = try await networkService.fetchFlights()
+        await cache.setFlights(allFlights)
+        
+        return allFlights
+    }
+    
     
     /// Filters flights using fields:
     /// - `originCountry` (e.g. "Spain")

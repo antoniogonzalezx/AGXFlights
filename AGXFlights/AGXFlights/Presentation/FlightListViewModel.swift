@@ -16,10 +16,35 @@ class FlightListViewModel: ObservableObject {
     @Published var searchText = ""
     
     private let searchFlightsUseCase: SearchFlightsUseCaseProtocol
+    private let flightRepository: FlightRepositoryProtocol
     private var searchTask: Task<Void, Never>?
     
-    init(searchFlightsUseCase: SearchFlightsUseCaseProtocol) {
+    init(
+        searchFlightsUseCase: SearchFlightsUseCaseProtocol,
+        flightRepository: FlightRepositoryProtocol
+    ) {
         self.searchFlightsUseCase = searchFlightsUseCase
+        self.flightRepository = flightRepository
+    }
+    
+    func loadFlights() {
+        searchTask?.cancel()
+        
+        searchTask = Task {
+            isLoading = true
+            errorMessage = nil
+            
+            do {
+                let results = try await flightRepository.fetchAllFlights()
+                guard !Task.isCancelled else { return }
+                flights = results
+            } catch {
+                guard !Task.isCancelled else { return }
+                errorMessage = error.localizedDescription
+            }
+            
+            isLoading = false
+        }
     }
     
     func searchFlights() {
@@ -53,8 +78,8 @@ class FlightListViewModel: ObservableObject {
     func clear() {
         searchTask?.cancel()
         searchText = ""
-        flights = []
         errorMessage = nil
+        loadFlights()
     }
 }
 
