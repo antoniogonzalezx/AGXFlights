@@ -13,14 +13,14 @@ protocol NetworkServiceProtocol: Sendable {
 
 final class NetworkService: NetworkServiceProtocol, Sendable {
     private let session: URLSession
-    private let url = "https://opensky-network.org/api"
+    private let baseURL: String = "https://opensky-network.org/api"
     
     init(session: URLSession = .shared) {
         self.session = session
     }
     
     func fetchFlights() async throws -> [Flight] {
-        guard let url = URL(string: "\(self.url)/states/all") else {
+        guard let url = URL(string: "\(self.baseURL)/states/all") else {
             throw NetworkError.invalidURL
         }
         
