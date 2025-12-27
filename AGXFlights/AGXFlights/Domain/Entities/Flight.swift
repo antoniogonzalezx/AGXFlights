@@ -1,0 +1,19 @@
+//
+//  Flight.swift
+//  AGXFlights
+//
+//  Created by Antonio González Valdepeñas on 26/12/25.
+//
+
+import Foundation
+
+struct Flight: Identifiable, Equatable, Sendable {
+    let id: String
+    let callsign: String?
+    let originCountry: String
+    let timePosition: Date?
+    let longitude: Double?
+    let latitude: Double?
+    let velocity: Double?
+    let altitude: Double?
+}
