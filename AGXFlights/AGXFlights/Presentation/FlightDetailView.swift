@@ -8,35 +8,154 @@
 import SwiftUI
 
 struct FlightDetailView: View {
-    let flight: Flight
+    @StateObject private var viewModel: FlightDetailViewModel
+    
+    init(viewModel: FlightDetailViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
     
     var body: some View {
         List {
+            flightCardView
             Section("Details") {
-                DetailRowView(icon: .globe, title: "Country", value: flight.originCountry)
                 
-                if let latitude = flight.latitude {
-                    DetailRowView(icon: .location, title: "Latitude", value: String(format: "%.4f°", latitude))
-                }
-                
-                if let longitude = flight.longitude {
-                    DetailRowView(icon: .location, title: "Longitude", value: String(format: "%.4f°", longitude))
-                }
-                
-                if let altitude = flight.altitude {
-                    DetailRowView(icon: .altitude, title: "Altitude", value: String(format: "%.0f m", altitude))
-                }
-                
-                if let velocity = flight.velocity {
-                    DetailRowView(icon: .speed, title: "Velocity", value: String(format: "%.0f m/s", velocity))
-                }
-                
-                if let time = flight.timePosition {
-                    DetailRowView(icon: .clock, title: "Last Update", value: time.formatted(date: .abbreviated, time: .shortened))
-                }
             }
         }
-        .navigationTitle(flight.callsign ?? "Flight Details")
+        .navigationTitle(viewModel.flight.callsign ?? "Flight Details")
+        .task {
+            viewModel.load()
+        }
+    }
+    
+    @ViewBuilder
+    private var flightCardView: some View {
+        ZStack {
+            VStack {
+                flightImageView
+                    .clipShape(.rect(corners: .concentric, isUniform: true))
+                
+                routeView
+            }
+        }
+        .containerShape(
+            .rect(cornerRadius: 24)
+        )
+    }
+    
+    @ViewBuilder
+    private var flightImageView: some View {
+        if let imageURL = viewModel.imageURL {
+            AsyncImage(url: imageURL) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(height: 180)
+                        .clipped()
+                    
+                case .failure:
+                    placeholder
+                    
+                case .empty:
+                    placeholder
+                        .redacted(reason: .placeholder)
+                    
+                @unknown default:
+                    placeholder
+                }
+            }
+            .task {
+                print(imageURL)
+            }
+        } else {
+            placeholder
+        }
+    }
+    
+    private var placeholder: some View {
+        ZStack {
+            LinearGradient(
+                colors: [.blue.opacity(0.6), .cyan.opacity(0.4)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            
+            VStack(spacing: 8) {
+                Icons.airplane.image
+                    .font(.system(size: 50))
+                    .foregroundStyle(.white.opacity(0.9))
+                
+                Text(viewModel.flight.displayCallsign)
+                    .font(.title2.bold())
+                    .foregroundStyle(.white)
+            }
+        }
+        .frame(height: 180)
+    }
+    
+    @ViewBuilder
+    private var routeView: some View {
+        if let route = viewModel.flightRoute {
+            HStack {
+                Icons.airplane.image
+                
+                VStack {
+                    if let iata = route.origin.iata {
+                        Text(iata)
+                    }
+                    Text(route.origin.name)
+                }
+                
+                Spacer()
+                
+                VStack {
+                    if let iata = route.destination.iata {
+                        Text(iata)
+                    }
+                    Text(route.destination.name)
+                }
+                
+                Icons.airplane.image
+            }
+        } else {
+            HStack {
+                Icons.airplane.image
+                VStack {
+                    Text("MAD")
+                        .font(.largeTitle)
+                    Text("Madrid")
+                        .font(.caption)
+                }
+                Spacer()
+                VStack {
+                    Text("MAD")
+                        .font(.largeTitle)
+                    Text("Madrid")
+                        .font(.caption)
+                }
+                Icons.airplane.image
+            }
+            .padding(.horizontal)
+            .redacted(reason: .placeholder)
+        }
+    }
+    
+    private func airportView(icon: Icons, code: String, name: String) -> some View {
+        HStack {
+            icon.image
+            
+            VStack {
+                Text(code)
+                    .font(.title3.bold())
+                
+                Text(name)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+        }
+        .frame(maxWidth: 120)
     }
 }
 
@@ -62,6 +181,11 @@ struct DetailRowView: View {
 
 #Preview {
     NavigationStack {
-        FlightDetailView(flight: .flight1)
+        FlightDetailView(
+            viewModel: FlightDetailViewModel(
+                flight: .flight1,
+                hexDBService: HexDBService()
+            )
+        )
     }
 }

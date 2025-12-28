@@ -8,14 +8,16 @@
 import Foundation
 
 @MainActor
-final class DependencyContainer {
-    static var shared = DependencyContainer()
+final class DependencyManager {
+    static var shared = DependencyManager()
     
     private init() {}
     
     private lazy var cache = FlightCache()
     
     private lazy var networkService: NetworkServiceProtocol = NetworkService()
+    
+    private lazy var hexDBService: HexDBServiceProtocol = HexDBService()
     
     private lazy var flightRepository: FlightRepositoryProtocol = FlightRepositoryImpl(
         networkService: networkService,
@@ -31,5 +33,9 @@ final class DependencyContainer {
             searchFlightsUseCase: searchFlightsUseCase,
             flightRepository: flightRepository
         )
+    }
+    
+    func makeFlightDetailViewModel(flight: Flight) -> FlightDetailViewModel {
+        FlightDetailViewModel(flight: flight, hexDBService: hexDBService)
     }
 }

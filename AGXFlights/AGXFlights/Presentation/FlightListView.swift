@@ -63,7 +63,9 @@ struct FlightListView: View {
             }
         }
         .navigationDestination(for: Flight.self) { flight in
-            FlightDetailView(flight: flight)
+            FlightDetailView(
+                viewModel: DependencyManager.shared.makeFlightDetailViewModel(flight: flight)
+            )
         }
     }
     
