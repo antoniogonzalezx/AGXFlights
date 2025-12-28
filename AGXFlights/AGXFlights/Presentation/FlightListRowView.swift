@@ -19,7 +19,7 @@ struct FlightListRowView: View {
                 .foregroundStyle(.secondary)
             
             VStack(alignment: .leading, spacing: 0) {
-                Text(flight.callsign ?? "UNKNOWN")
+                Text(flight.displayCallsign)
                     .font(.headline)
                 
                 Text(flight.originCountry)

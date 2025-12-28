@@ -16,4 +16,11 @@ struct Flight: Identifiable, Equatable, Sendable, Hashable {
     let latitude: Double?
     let velocity: Double?
     let altitude: Double?
+    
+    var displayCallsign: String {
+        guard let callsign, !callsign.isEmpty else {
+            return "UNKNOWN"
+        }
+        return callsign
+    }
 }
