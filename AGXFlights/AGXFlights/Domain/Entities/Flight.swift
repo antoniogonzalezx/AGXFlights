@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Flight: Identifiable, Equatable, Sendable {
+struct Flight: Identifiable, Equatable, Sendable, Hashable {
     let id: String
     let callsign: String?
     let originCountry: String

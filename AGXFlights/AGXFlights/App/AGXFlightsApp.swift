@@ -11,7 +11,9 @@ import SwiftUI
 struct AGXFlightsApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            FlightListView(
+                viewModel: DependencyContainer.shared.makeFlightListViewModel()
+            )
         }
     }
 }
