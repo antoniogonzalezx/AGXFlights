@@ -12,7 +12,7 @@ struct AGXFlightsApp: App {
     var body: some Scene {
         WindowGroup {
             FlightListView(
-                viewModel: DependencyContainer.shared.makeFlightListViewModel()
+                viewModel: DependencyManager.shared.makeFlightListViewModel()
             )
         }
     }

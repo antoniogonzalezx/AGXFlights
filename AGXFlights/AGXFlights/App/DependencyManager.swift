@@ -1,5 +1,5 @@
 //
-//  DependencyContainer.swift
+//  DependencyManager.swift
 //  AGXFlights
 //
 //  Created by Antonio González Valdepeñas on 27/12/25.
@@ -8,8 +8,8 @@
 import Foundation
 
 @MainActor
-final class DependencyContainer {
-    static var shared = DependencyContainer()
+final class DependencyManager {
+    static var shared = DependencyManager()
     
     private init() {}
     

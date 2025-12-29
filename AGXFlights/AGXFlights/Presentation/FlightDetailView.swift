@@ -36,7 +36,7 @@ struct FlightDetailView: View {
                 }
             }
         }
-        .navigationTitle(flight.callsign ?? "Flight Details")
+        .navigationTitle(flight.displayCallsign)
     }
 }
 
