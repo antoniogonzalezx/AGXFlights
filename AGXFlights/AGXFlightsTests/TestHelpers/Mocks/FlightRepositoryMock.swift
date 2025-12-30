@@ -14,6 +14,7 @@ final class FlightRepositoryMock: FlightRepositoryProtocol {
     var fetchAllResult: [Flight] = []
     var searchCallCount = 0
     var fetchAllCallCount = 0
+    var clearCacheCallCount = 0
     var lastSearchQuery: String?
     var shouldThrowError = false
     var error: Error = NetworkError.invalidResponse
@@ -29,5 +30,9 @@ final class FlightRepositoryMock: FlightRepositoryProtocol {
         fetchAllCallCount += 1
         if shouldThrowError { throw error }
         return fetchAllResult
+    }
+    
+    func clearCache() async {
+        clearCacheCallCount += 1
     }
 }

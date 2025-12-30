@@ -62,6 +62,9 @@ struct FlightListView: View {
                 FlightListRowView(flight: flight)
             }
         }
+        .refreshable {
+            await viewModel.refresh()
+        }
         .navigationDestination(for: Flight.self) { flight in
             FlightDetailView(flight: flight)
         }

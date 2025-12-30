@@ -85,4 +85,23 @@ struct FlightListViewModelTests {
         #expect(viewModel.searchText.isEmpty)
         #expect(repository.fetchAllCallCount == 1)
     }
+    
+    @Test("Refresh clears cache and reloads flights")
+    func refreshClearsCacheAndReloadsFlights() async throws {
+        // given
+        let useCase = SearchFlightsUseCaseMock()
+        let repository = FlightRepositoryMock()
+        repository.fetchAllResult = [Flight.mock(), Flight.mock(id: "123456")]
+        let viewModel = FlightListViewModel(
+            searchFlightsUseCase: useCase,
+            flightRepository: repository
+        )
+        // when
+        await viewModel.refresh()
+        // then
+        #expect(repository.clearCacheCallCount == 1)
+        #expect(repository.fetchAllCallCount == 1)
+        #expect(viewModel.flights.count == 2)
+        #expect(viewModel.errorMessage == nil)
+    }
 }

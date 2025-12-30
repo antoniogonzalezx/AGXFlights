@@ -81,5 +81,18 @@ class FlightListViewModel: ObservableObject {
         errorMessage = nil
         loadFlights()
     }
+    
+    func refresh() async {
+        await flightRepository.clearCache()
+        
+        errorMessage = nil
+        
+        do {
+            let results = try await flightRepository.fetchAllFlights()
+            flights = results
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 }
 

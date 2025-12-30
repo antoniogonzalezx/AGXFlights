@@ -57,6 +57,9 @@ final class FlightRepositoryImpl: FlightRepositoryProtocol, Sendable {
         return allFlights
     }
     
+    func clearCache() async {
+        await cache.clear()
+    }
     
     /// Filters flights using fields:
     /// - `originCountry` (e.g. "Spain")
