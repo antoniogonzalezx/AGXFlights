@@ -2,6 +2,12 @@
 
 A real-time flight tracking app for iOS.
 
+## Screenshots
+
+| Flights list | Search by airline | Flight detail |
+|:---:|:---:|:---:|
+| <img width="300" alt="Flights list" src="https://github.com/user-attachments/assets/c6678100-d07c-4099-b787-3f975f6b5942" /> | <img width="300" alt="Search by airline" src="https://github.com/user-attachments/assets/ef79127e-eed8-48c7-b6f9-0e04008be2dc" /> | <img width="300" alt="Flight detail" src="https://github.com/user-attachments/assets/2fac98af-659f-429c-83cc-cfefc96ae53e" /> |
+
 ## What does it do?
 
 It consumes the [OpenSky Network API](https://openskynetwork.github.io/opensky-api/) to display flights currently in the air. You can search by country of origin (e.g., "Spain") or by flight code (e.g., "IBE" for Iberia).
@@ -18,7 +24,6 @@ The endpoint I use is `https://opensky-network.org/api/states/all` which returns
 ## Architecture
 
 I followed a fairly classic layered architecture:
-
 ```
 Presentation  →  Domain  →  Data
 (SwiftUI)       (UseCases)   (Repository, Cache, Network)
@@ -52,7 +57,6 @@ The time interval is set to 2 minutes. Which I consider a reasonable time to kee
 ### Search cancellation
 
 Every time the user types something new, I cancel the previous search:
-
 ```swift
 func searchFlights() {
     searchTask?.cancel()  // Previous search is cancelled
@@ -87,8 +91,8 @@ One thing that took me a bit was testing the ViewModel. Since the methods launch
 
 ## Future improvements
 
-### 1. **Map with flights**
-The API returns coordinates. It would have been cool to show the planes on a MapKit with their real positions. You could even animate the movement by refreshing every X seconds.
+### 1. **Full map view**
+The detail already shows a mini map with the flight position. A natural next step would be a full-screen map showing all flights at once, with the ability to tap on any plane to see its details.
 
 ### 2. **Enriched detail with another API**
 OpenSky gives basic data, but there are APIs like [hexdb.io](https://hexdb.io) that from the flight code give you the model of the aircraft, airline, some details about the route... The detail screen would have been much more complete.
@@ -99,11 +103,7 @@ Filter by minimum altitude, speed, only flights from a specific airline... The l
 ### 4. **Cache persistence**
 Right now the cache is in memory. If you close the app, you lose everything. With UserDefaults or a JSON file it would be easy to persist it.
 
-### 5. **Pull to refresh**
-To manually refresh the list. Currently it only refreshes when you search or when the cache expires.
-
 ## Project structure
-
 ```
 AGXFlights/
 ├── App/
