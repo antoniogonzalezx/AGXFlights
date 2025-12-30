@@ -10,6 +10,7 @@ import SwiftUI
 enum Icons: String {
     case airplane = "airplane"
     case airplaneList = "airplane.up.right.app.fill"
+    case airplanePath = "airplane.path.dotted"
     case location = "location.fill"
     case altitude = "arrow.up"
     case speed = "speedometer"

@@ -6,12 +6,20 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct FlightDetailView: View {
     let flight: Flight
     
     var body: some View {
         List {
+            if let coordinate = flight.coordinate {
+                Section {
+                    FlightMapView(coordinate: coordinate, callSign: flight.displayCallsign)
+                        .frame(height: 200)
+                        .listRowInsets(EdgeInsets())
+                }
+            }
             Section("Details") {
                 DetailRowView(icon: .globe, title: "Country", value: flight.originCountry)
                 
@@ -57,6 +65,30 @@ struct DetailRowView: View {
             
             Text(value)
         }
+    }
+}
+
+struct FlightMapView: View {
+    let coordinate: CLLocationCoordinate2D
+    let callSign: String
+    
+    private var camera: MapCamera {
+        MapCamera(
+            centerCoordinate: coordinate,
+            distance: 500000
+        )
+    }
+    
+    var body: some View {
+        Map(initialPosition: .camera(camera)) {
+            Annotation(callSign, coordinate: coordinate) {
+                Icons.airplanePath.image
+                    .font(.title)
+                    .foregroundStyle(.white)
+            }
+        }
+        .mapStyle(.imagery)
+        .disabled(true)
     }
 }
 
