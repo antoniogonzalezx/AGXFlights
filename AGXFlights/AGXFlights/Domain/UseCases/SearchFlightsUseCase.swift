@@ -8,7 +8,7 @@
 import Foundation
 
 protocol SearchFlightsUseCaseProtocol: Sendable {
-    func search(query: String) async throws -> [Flight]
+    func search(query: String) async throws -> FlightsResult
 }
 
 class SearchFlightsUseCase: SearchFlightsUseCaseProtocol, Sendable {
@@ -18,11 +18,11 @@ class SearchFlightsUseCase: SearchFlightsUseCaseProtocol, Sendable {
         self.repository = repository
     }
     
-    func search(query: String) async throws -> [Flight] {
+    func search(query: String) async throws -> FlightsResult {
         let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
         
         guard !query.isEmpty else {
-            return []
+            return FlightsResult(flights: [], fromCache: true)
         }
         
         return try await repository.searchFlights(query: query)

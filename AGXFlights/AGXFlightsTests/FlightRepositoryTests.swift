@@ -23,7 +23,8 @@ struct FlightRepositoryTests {
         // when
         let result = try await repository.searchFlights(query: "spain")
         // then
-        #expect(result.count == 1)
+        #expect(result.flights.count == 1)
+        #expect(result.fromCache == true)
         #expect(networkService.fetchCallCount == 0)
     }
     
@@ -31,7 +32,7 @@ struct FlightRepositoryTests {
     func searchFetchesResultsFromNetwork() async throws {
         // given
         let networkService = NetworkServiceMock()
-        networkService.fetchResult = [
+        networkService.flightsResult = [
             Flight.mock(id: "1", country: "Spain"),
             Flight.mock(id: "2", country: "France")
         ]
@@ -40,8 +41,9 @@ struct FlightRepositoryTests {
         //when
         let result = try await repository.searchFlights(query: "spain")
         // then
-        #expect(result.count == 1)
-        #expect(result.first?.originCountry.uppercased() == "SPAIN")
+        #expect(result.flights.count == 1)
+        #expect(result.fromCache == false)
+        #expect(result.flights.first?.originCountry.uppercased() == "SPAIN")
         #expect(networkService.fetchCallCount == 1)
     }
     
@@ -52,7 +54,7 @@ struct FlightRepositoryTests {
     func searchFiltersResultsByCountryAndCallSign(_ query: String) async throws {
         // given
         let networkService = NetworkServiceMock()
-        networkService.fetchResult = [
+        networkService.flightsResult = [
             Flight.mock(id: "1", callsign: "Spain", country: "IBE123"),
             Flight.mock(id: "2", callsign: "France", country: "XYZ456"),
             Flight.mock(id: "3", callsign: "Spain", country: "IBE789")
@@ -62,7 +64,7 @@ struct FlightRepositoryTests {
         // when
         let result = try await repository.searchFlights(query: query)
         // then
-        #expect(result.count == 2)
+        #expect(result.flights.count == 2)
         #expect(networkService.fetchCallCount == 1)
     }
     
@@ -75,7 +77,8 @@ struct FlightRepositoryTests {
         // when
         let result = try await repository.searchFlights(query: "")
         // then
-        #expect(result.isEmpty)
+        #expect(result.flights.isEmpty)
+        #expect(result.fromCache == true)
         #expect(networkService.fetchCallCount == 0)
     }
     
@@ -94,7 +97,8 @@ struct FlightRepositoryTests {
         // when
         let result = try await repository.fetchAllFlights()
         // then
-        #expect(result.count == 2)
+        #expect(result.flights.count == 2)
+        #expect(result.fromCache == true)
         #expect(networkService.fetchCallCount == 0)
     }
     
@@ -102,7 +106,7 @@ struct FlightRepositoryTests {
     func fetchAllFlightsFetchesFromNetworkWhenCacheIsEmpty() async throws {
         // given
         let networkService = NetworkServiceMock()
-        networkService.fetchResult = [
+        networkService.flightsResult = [
             Flight.mock(id: "1", country: "Spain"),
             Flight.mock(id: "2", country: "France")
             ]
@@ -111,8 +115,8 @@ struct FlightRepositoryTests {
         // when
         let result = try await repository.fetchAllFlights()
         //then
-        #expect(result.count == 2)
+        #expect(result.flights.count == 2)
+        #expect(result.fromCache == false)
         #expect(networkService.fetchCallCount == 1)
     }
 }
-

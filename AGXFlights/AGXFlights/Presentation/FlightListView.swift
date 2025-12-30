@@ -57,9 +57,17 @@ struct FlightListView: View {
     }
     
     private var flightList: some View {
-        List(viewModel.flights) { flight in
-            NavigationLink(value: flight) {
-                FlightListRowView(flight: flight)
+        List {
+            Section {
+                ForEach(viewModel.flights) { flight in
+                    NavigationLink(value: flight) {
+                        FlightListRowView(flight: flight)
+                    }
+                }
+            } header: {
+                if let lastUpdated = viewModel.lastUpdated {
+                    Text("Updated \(lastUpdated, format: .relative(presentation: .named))")
+                }
             }
         }
         .refreshable {

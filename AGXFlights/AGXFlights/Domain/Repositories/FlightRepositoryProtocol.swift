@@ -7,8 +7,13 @@
 
 import Foundation
 
+struct FlightsResult: Sendable {
+    let flights: [Flight]
+    let fromCache: Bool
+}
+
 protocol FlightRepositoryProtocol: Sendable {
-    func searchFlights(query: String) async throws -> [Flight]
-    func fetchAllFlights() async throws -> [Flight]
+    func searchFlights(query: String) async throws -> FlightsResult
+    func fetchAllFlights() async throws -> FlightsResult
     func clearCache() async
 }

@@ -20,9 +20,9 @@ struct SearchFlightsUseCaseTests {
         // when
         let result = try await useCase.search(query: "   spain  ")
         // then
-        #expect(result.count == 1)
+        #expect(result.flights.count == 1)
         #expect(repository.lastSearchQuery == "spain")
-        #expect(result.first?.originCountry.uppercased() == "SPAIN")
+        #expect(result.flights.first?.originCountry.uppercased() == "SPAIN")
         #expect(repository.searchCallCount == 1)
     }
     
@@ -34,7 +34,7 @@ struct SearchFlightsUseCaseTests {
         // when
         let result = try await useCase.search(query: " ")
         // then
-        #expect(result.isEmpty)
+        #expect(result.flights.isEmpty)
         #expect(repository.searchCallCount == 0)
     }
 }

@@ -16,23 +16,23 @@ final class FlightRepositoryImpl: FlightRepositoryProtocol, Sendable {
         self.cache = cache
     }
     
-    func searchFlights(query: String) async throws -> [Flight] {
+    func searchFlights(query: String) async throws -> FlightsResult {
         let formattedQuery = query.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         
         guard !formattedQuery.isEmpty else {
-            return []
+            return FlightsResult(flights: [], fromCache: true)
         }
         
         // 1. Check search cache
         if let cachedFlights = await cache.getSearchResults(for: formattedQuery) {
-            return cachedFlights
+            return FlightsResult(flights: cachedFlights, fromCache: true)
         }
         
         // 2. Check all flights cache and filter locally
         if let flights = await cache.getFlights() {
             let filtered = filterFlights(flights, query: formattedQuery)
             await cache.setSearchResults(filtered, for: formattedQuery)
-            return filtered
+            return FlightsResult(flights: filtered, fromCache: true)
         }
         
         // 3. Fetch flights from network
@@ -43,23 +43,24 @@ final class FlightRepositoryImpl: FlightRepositoryProtocol, Sendable {
         let filteredFlights = filterFlights(allFlights, query: formattedQuery)
         await cache.setSearchResults(filteredFlights, for: formattedQuery)
         
-        return filteredFlights
+        return FlightsResult(flights: filteredFlights, fromCache: false)
     }
     
-    func fetchAllFlights() async throws -> [Flight] {
+    func fetchAllFlights() async throws -> FlightsResult {
         if let cachedFlights = await cache.getFlights() {
-            return cachedFlights
+            return FlightsResult(flights: cachedFlights, fromCache: true)
         }
         
         let allFlights = try await networkService.fetchFlights()
         await cache.setFlights(allFlights)
         
-        return allFlights
+        return FlightsResult(flights: allFlights, fromCache: false)
     }
     
     func clearCache() async {
         await cache.clear()
     }
+    
     
     /// Filters flights using fields:
     /// - `originCountry` (e.g. "Spain")

@@ -10,7 +10,7 @@ import Foundation
 
 @MainActor
 final class NetworkServiceMock: NetworkServiceProtocol {
-    var fetchResult: [Flight] = []
+    var flightsResult: [Flight] = []
     var fetchCallCount = 0
     var shouldThrowError = false
     var error: Error = NetworkError.invalidResponse
@@ -18,6 +18,6 @@ final class NetworkServiceMock: NetworkServiceProtocol {
     func fetchFlights() async throws -> [Flight] {
         fetchCallCount += 1
         if shouldThrowError { throw error }
-        return fetchResult
+        return flightsResult
     }
 }

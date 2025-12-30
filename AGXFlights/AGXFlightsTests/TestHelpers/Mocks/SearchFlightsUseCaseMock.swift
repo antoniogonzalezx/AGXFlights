@@ -11,13 +11,14 @@ import Foundation
 @MainActor
 final class SearchFlightsUseCaseMock: SearchFlightsUseCaseProtocol {
     var searchResult: [Flight] = []
+    var fromCache: Bool = false
     var searchCallCount = 0
     var shouldThrowError = false
     var error: Error = NetworkError.invalidResponse
     
-    func search(query: String) async throws -> [Flight] {
+    func search(query: String) async throws -> FlightsResult {
         searchCallCount += 1
         if shouldThrowError { throw error }
-        return searchResult
+        return FlightsResult(flights: searchResult, fromCache: fromCache)
     }
 }

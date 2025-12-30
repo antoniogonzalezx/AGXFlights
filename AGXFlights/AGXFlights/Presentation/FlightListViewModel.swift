@@ -13,6 +13,7 @@ class FlightListViewModel: ObservableObject {
     @Published private(set) var flights: [Flight] = []
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
+    @Published private(set) var lastUpdated: Date?
     @Published var searchText = ""
     
     private let searchFlightsUseCase: SearchFlightsUseCaseProtocol
@@ -35,9 +36,12 @@ class FlightListViewModel: ObservableObject {
             errorMessage = nil
             
             do {
-                let results = try await flightRepository.fetchAllFlights()
+                let result = try await flightRepository.fetchAllFlights()
                 guard !Task.isCancelled else { return }
-                flights = results
+                flights = result.flights
+                if !result.fromCache {
+                    lastUpdated = Date()
+                }
             } catch {
                 guard !Task.isCancelled else { return }
                 errorMessage = error.localizedDescription
@@ -62,9 +66,12 @@ class FlightListViewModel: ObservableObject {
             errorMessage = nil
             
             do {
-                let results = try await searchFlightsUseCase.search(query: query)
+                let result = try await searchFlightsUseCase.search(query: query)
                 guard !Task.isCancelled else { return }
-                flights = results
+                flights = result.flights
+                if !result.fromCache {
+                    lastUpdated = Date()
+                }
             } catch {
                 guard !Task.isCancelled else { return }
                 errorMessage = error.localizedDescription
@@ -88,11 +95,25 @@ class FlightListViewModel: ObservableObject {
         errorMessage = nil
         
         do {
-            let results = try await flightRepository.fetchAllFlights()
-            flights = results
+            let result = try await flightRepository.fetchAllFlights()
+            flights = result.flights
+            lastUpdated = Date()
         } catch {
             errorMessage = error.localizedDescription
         }
     }
+    
+    func refreshFlight(id: String) async -> Flight? {
+        await flightRepository.clearCache()
+        
+        do {
+            let result = try await flightRepository.fetchAllFlights()
+            flights = result.flights
+            lastUpdated = Date()
+            return result.flights.first { $0.id == id }
+        } catch {
+            errorMessage = error.localizedDescription
+            return nil
+        }
+    }
 }
-
